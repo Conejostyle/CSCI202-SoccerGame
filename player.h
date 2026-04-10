@@ -24,5 +24,6 @@ public:
     void setPassingStat(int stat);
     void setShootingStat(int stat);
     void setDribblingStat(int stat);
+
 };
 #endif

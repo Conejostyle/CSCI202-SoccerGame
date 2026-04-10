@@ -2,9 +2,11 @@
 #define MATCHDAY_H
 #include <string>
 
+class PlayerQueue;
+
 class MatchDay {
     private:
-        int tournamentRound; // 1 for round of 16, 2 for quarterfinals, 3 for semifinals, 4 for final
+        int tournamentRound = 1; // 1 for round of 16, 2 for quarterfinals, 3 for semifinals, 4 for final
         std::string userTeam;
         std::string opponentTeam;
         int userTeamScore = 0;
@@ -22,5 +24,6 @@ class MatchDay {
         void setUserTeamScore(int score);
         void setOpponentTeamScore(int score);
 
+        std::string runMatch(PlayerQueue& turns, const std::string& stageName);
     };
 #endif

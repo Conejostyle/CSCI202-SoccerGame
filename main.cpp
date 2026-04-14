@@ -9,6 +9,8 @@
 #include "PlayerQueue.h"
 #include "StageNode.h"
 
+#include <cstdlib>
+#include <ctime>
 #include <iostream>
 
 int main(){
@@ -40,6 +42,7 @@ int main(){
             std::cin >> gkName;
             goalKeeper.setName(gkName);
             goalKeeper.setPosition("Goalkeeper");
+            
             goalKeeper.setShootingStat(35);
 
             std::cout << "Enter your defender's name: ";
@@ -47,6 +50,9 @@ int main(){
             std::cin >> defenderName;
             defender.setName(defenderName);
             defender.setPosition("Defender");
+            //Stats will be randomized in a later iteration of the game.
+            //For now, the stats are set to fixed values based on position.
+            //Shooting stats determine chance of scoring a goal during an event.
             defender.setShootingStat(50);
 
             std::cout << "Enter your midfielder's name: ";

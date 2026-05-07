@@ -46,6 +46,7 @@ std::string MatchDay::runMatch(PlayerQueue& turns, const std::string& stageName)
     std::cout << "\n=== " << stageName << " ===" << std::endl;
     std::cout << getUserTeam() << " vs. " << getOpponentTeam() << std::endl;
 
+    //Creating the event stack so this match resolves its events in stack order.
     EventStack events;
     MatchEvent event1;
     event1.setEventType("Long Shot");
@@ -82,8 +83,11 @@ std::string MatchDay::runMatch(PlayerQueue& turns, const std::string& stageName)
     event7.setChanceAtGoal(20);
     events.push(event7);
 
+    //Running the match one event at a time until the stack is empty.
     while (!events.isEmpty()) {
         MatchEvent currentEvent = events.pop();
+
+        //Taking the next player from the front of the queue for the current turn.
         Player currentPlayer = turns.dequeue();
         std::cout << currentEvent.getEventType() << "!" << std::endl;
         std::cout << currentPlayer.getName() << " has the ball..." << std::endl;
@@ -125,6 +129,7 @@ std::string MatchDay::runMatch(PlayerQueue& turns, const std::string& stageName)
             std::cout << "No goal on this chance." << std::endl;
         }
 
+        //Placing the current player at the back of the queue after their turn is over.
         turns.enqueue(currentPlayer);
     }
 

@@ -9,9 +9,12 @@
                 "-fdiagnostics-color=always",
                 "-g",
                 "main.cpp",
+                "Game.cpp",
                 "player.cpp",
                 "matchEvent.cpp",
                 "matchDay.cpp",
+                "PlayerQueue.cpp",
+                "EventStack.cpp",
                 "-o",
                 "main.exe"
             ],

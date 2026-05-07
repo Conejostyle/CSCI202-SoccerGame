@@ -5,7 +5,9 @@
 
 class PlayerQueueNode {
 public:
+    //Storing one player inside a queue node.
     Player player;
+    //Creating the pointer variable to the next player in the queue.
     PlayerQueueNode* next;
 
     explicit PlayerQueueNode(const Player& newPlayer)
@@ -15,7 +17,9 @@ public:
 
 class PlayerQueue {
 private:
+    //Creating the front pointer for the queue so turns are taken in order.
     PlayerQueueNode* front;
+    //Creating the rear pointer so new players can be added to the back of the queue.
     PlayerQueueNode* rear;
 
 public:

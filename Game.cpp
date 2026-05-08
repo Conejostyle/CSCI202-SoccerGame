@@ -32,6 +32,9 @@ void Game::setupTeam() {
 
     //Creating the player roster, with names as inputs, and setting their default stats.
     setupPlayers();
+
+    //Loading the starter inventory into the hash table before the tournament begins.
+    setupInventory();
 }
 
 void Game::setupPlayers() {
@@ -63,6 +66,16 @@ void Game::setupPlayers() {
     forward.setName(forwardName);
     forward.setPosition("Forward");
     forward.setShootingStat(90);
+}
+
+void Game::setupInventory() {
+    //Clearing any old item data so a new tournament starts with a fresh inventory.
+    inventory.clear();
+
+    //Adding a few simple inventory items into the hash table for the user to use between stages.
+    inventory.addItem("Power Boots", 1, 10);
+    inventory.addItem("Team Talk", 1, 5);
+    inventory.addItem("Lucky Tape", 1, 15);
 }
 
 void Game::buildStages() {
@@ -98,7 +111,51 @@ void Game::playTournament() {
         matchDay.setTournamentRound(roundNumber);
         matchDay.setOpponentTeam(currentStage->opponentName);
 
-        std::string result = matchDay.runMatch(turns, currentStage->stageName);
+        //Asking the user to choose a tactic from the tactic tree before the stage begins.
+        std::cout << "\nChoose a tactic for this stage:" << std::endl;
+        tactics.displayTactics();
+        int tacticChoice = 0;
+        while (tacticChoice < 1 || tacticChoice > 3) {
+            std::cout << "Enter 1, 2, or 3: ";
+            std::cin >> tacticChoice;
+        }
+
+        std::string tacticName;
+        int shootBonus = 0;
+        int passBonus = 0;
+        tactics.chooseTacticByNumber(tacticChoice, tacticName, shootBonus, passBonus);
+        std::cout << "Tactic selected: " << tacticName << std::endl;
+
+        //Showing the inventory hash table and giving the user a chance to use one item before the match.
+        std::cout << "\nInventory available before the match:" << std::endl;
+        inventory.displayInventory();
+        std::cout << "0. No item" << std::endl;
+        std::cout << "1. Power Boots" << std::endl;
+        std::cout << "2. Team Talk" << std::endl;
+        std::cout << "3. Lucky Tape" << std::endl;
+
+        int itemChoice = -1;
+        while (itemChoice < 0 || itemChoice > 3) {
+            std::cout << "Choose an item to use before the stage: ";
+            std::cin >> itemChoice;
+        }
+
+        int itemBonus = 0;
+        if (itemChoice == 1) {
+            itemBonus = inventory.useItem("Power Boots");
+            std::cout << "Power Boots used for a +" << itemBonus << " chance bonus." << std::endl;
+        } else if (itemChoice == 2) {
+            itemBonus = inventory.useItem("Team Talk");
+            std::cout << "Team Talk used for a +" << itemBonus << " chance bonus." << std::endl;
+        } else if (itemChoice == 3) {
+            itemBonus = inventory.useItem("Lucky Tape");
+            std::cout << "Lucky Tape used for a +" << itemBonus << " chance bonus." << std::endl;
+        } else {
+            std::cout << "No item used before this stage." << std::endl;
+        }
+
+        // std::string result = matchDay.runMatch(turns, currentStage->stageName);
+        std::string result = matchDay.runMatch(turns, currentStage->stageName, shootBonus, passBonus, itemBonus);
         std::cout << result << std::endl;
 
         if (result.find("lost") != std::string::npos) {

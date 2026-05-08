@@ -29,6 +29,7 @@ class MatchDay {
         void setUserTeamScore(int score);
         void setOpponentTeamScore(int score);
 
-        std::string runMatch(PlayerQueue& turns, const std::string& stageName);
+        // std::string runMatch(PlayerQueue& turns, const std::string& stageName);
+        std::string runMatch(PlayerQueue& turns, const std::string& stageName, int shootBonus, int passBonus, int itemBonus);
     };
 #endif

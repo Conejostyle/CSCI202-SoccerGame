@@ -1,5 +1,6 @@
 #include "matchDay.h"
 #include "EventStack.h"
+#include "FieldGraph.h"
 #include "PlayerQueue.h"
 
 #include <cstdlib>
@@ -39,7 +40,8 @@ int MatchDay::getOpponentTeamScore() const {
 }
 
 //MatchDay does most of the carrying for the game logic itself.
-std::string MatchDay::runMatch(PlayerQueue& turns, const std::string& stageName) {
+// std::string MatchDay::runMatch(PlayerQueue& turns, const std::string& stageName) {
+std::string MatchDay::runMatch(PlayerQueue& turns, const std::string& stageName, int shootBonus, int passBonus, int itemBonus) {
     setUserTeamScore(0);
     setOpponentTeamScore(getTournamentRound() - 1);
 
@@ -92,12 +94,27 @@ std::string MatchDay::runMatch(PlayerQueue& turns, const std::string& stageName)
         std::cout << currentEvent.getEventType() << "!" << std::endl;
         std::cout << currentPlayer.getName() << " has the ball..." << std::endl;
 
-        int eventChance = currentEvent.getChanceAtGoal();
+        //Creating the field graph so the ball can move through connected zones during this event.
+        FieldGraph fieldGraph;
+        int currentZone = fieldGraph.getStartZone();
+        int successfulPasses = 0;
         bool playerHasBall = true;
 
         //Keeping the same event active until the player shoots or the ball is intercepted.
         while (playerHasBall) {
-            std::cout << "Current chance at goal: " << eventChance << "%" << std::endl;
+            //Rebuilding the current chance from the base event, successful passes, field zone, tactic, and item.
+            // int eventChance = currentEvent.getChanceAtGoal();
+            int currentChanceAtGoal = currentEvent.getChanceAtGoal()
+                + successfulPasses * (15 + passBonus)
+                + fieldGraph.getZoneBonus(currentZone)
+                + itemBonus;
+
+            if (currentChanceAtGoal > 95) {
+                currentChanceAtGoal = 95;
+            }
+
+            std::cout << "Current zone: " << fieldGraph.getZoneName(currentZone) << std::endl;
+            std::cout << "Current chance at goal: " << currentChanceAtGoal << "%" << std::endl;
 
             int playerChoice = 0;
             while (playerChoice != 1 && playerChoice != 2) {
@@ -131,14 +148,20 @@ std::string MatchDay::runMatch(PlayerQueue& turns, const std::string& stageName)
                     playerHasBall = false;
                 } else {
                     std::cout << "Pass completed successfully!" << std::endl;
-                    eventChance += 15;
+                    successfulPasses++;
 
-                    if (eventChance > 95) {
-                        eventChance = 95;
-                        //Balancing ^ so the player can never have more than a 95% chance at a goal.
-                        //Basically, you cannot pass forever to increase chances past 100%, since once you get to 95, you COULD still miss,
-                        //and also passing it also means possible interception.
+                    //Allowing the player to move the ball only to connected zones in the field graph.
+                    std::cout << "Choose the next zone for the pass:" << std::endl;
+                    fieldGraph.displayMoves(currentZone);
+
+                    int moveChoice = 0;
+                    int nextZone = -1;
+                    while (nextZone == -1) {
+                        std::cout << "Enter your move choice: ";
+                        std::cin >> moveChoice;
+                        nextZone = fieldGraph.getConnectedZoneByChoice(currentZone, moveChoice);
                     }
+                    currentZone = nextZone;
 
                     //Rotating the ball to the next player in the queue after a successful pass.
                     turns.enqueue(currentPlayer);
@@ -147,7 +170,12 @@ std::string MatchDay::runMatch(PlayerQueue& turns, const std::string& stageName)
                 }
             } else {
                 //Shooting depends only on the player's shooting stat and the current chance at goal.
-                int finalChance = (currentPlayer.getShootingStat() * eventChance) / 100;
+                int shotChance = currentChanceAtGoal + shootBonus;
+                if (shotChance > 95) {
+                    shotChance = 95;
+                }
+
+                int finalChance = (currentPlayer.getShootingStat() * shotChance) / 100;
                 int shotRoll = rand() % 100 + 1;
 
                 std::cout << "Shot success chance: " << finalChance << "/100" << std::endl;

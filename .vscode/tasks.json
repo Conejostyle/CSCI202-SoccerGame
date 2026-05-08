@@ -15,6 +15,9 @@
                 "matchDay.cpp",
                 "PlayerQueue.cpp",
                 "EventStack.cpp",
+                "FieldGraph.cpp",
+                "InventoryHashTable.cpp",
+                "TacticTree.cpp",
                 "-o",
                 "main.exe"
             ],

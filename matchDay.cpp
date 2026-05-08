@@ -107,10 +107,14 @@ std::string MatchDay::runMatch(PlayerQueue& turns, const std::string& stageName)
 
             //Passing gives the player a chance to increase their shooting chance, but also a risk of losing the ball.
             if (playerChoice == 2) {
-                //Basically 1 in 4 chance to lose the ball on a pass, which is a pretty big risk, but the reward is a 15% increase in shooting chance.
+                //Basically there's a chance to lose the ball on a pass, which is a pretty big risk, but the reward is a 15% increase in shooting chance.
                 int interceptRoll = rand() % 100 + 1;
 
-                if (interceptRoll <= 40) {
+                //ADJUST
+                //ADJUST
+                //ADJUST
+                //Adjusting this consistently until it feels balanced!!!!
+                if (interceptRoll <= 40) { // <-- ADJUST <--
                     std::cout << "The pass was intercepted!" << std::endl;
 
                     //Giving the opponent a small chance to score immediately after winning the ball.
@@ -118,6 +122,8 @@ std::string MatchDay::runMatch(PlayerQueue& turns, const std::string& stageName)
                     if (opponentCounterRoll == 0) {
                         std::cout << getOpponentTeam() << " scores on the counter attack!" << std::endl;
                         setOpponentTeamScore(getOpponentTeamScore() + 1);
+                        std::cout << "Current Score: " << getUserTeam() << " " << getUserTeamScore()
+                                  << " - " << getOpponentTeam() << " " << getOpponentTeamScore() << std::endl;
                     } else {
                         std::cout << getOpponentTeam() << " does not score from the interception." << std::endl;
                     }
@@ -149,6 +155,8 @@ std::string MatchDay::runMatch(PlayerQueue& turns, const std::string& stageName)
                 if (shotRoll <= finalChance) {
                     std::cout << "Goal for " << getUserTeam() << "!" << std::endl;
                     setUserTeamScore(getUserTeamScore() + 1);
+                    std::cout << "Current Score: " << getUserTeam() << " " << getUserTeamScore()
+                              << " - " << getOpponentTeam() << " " << getOpponentTeamScore() << std::endl;
                 } else {
                     std::cout << "No goal on this chance." << std::endl;
                 }
@@ -164,8 +172,19 @@ std::string MatchDay::runMatch(PlayerQueue& turns, const std::string& stageName)
     std::cout << "Final Score: " << getUserTeam() << " " << getUserTeamScore()
               << " - " << getOpponentTeamScore() << " " << getOpponentTeam() << std::endl;
 
-    if (getUserTeamScore() >= getOpponentTeamScore()) {
+    if (getUserTeamScore() > getOpponentTeamScore()) {
         return "Congratulations! You won the match!";
+    }
+    else if(getUserTeamScore() == getOpponentTeamScore()) {
+        std::cout << "It's a draw! On to penalties..." << std::endl;
+        //50/50 chance to win the penalty shootout for simplicity.
+        int penaltyRoll = rand() % 2; // 0 or 1 for a 50% chance at winning the shootout.
+        if (penaltyRoll == 0) {
+            return "Congratulations! You won the match!";
+        }
+        else {
+            return "Sorry, you lost the match. The journey ends here...";
+        }
     }
 
     return "Sorry, you lost the match. The journey ends here...";

@@ -27,7 +27,7 @@ void Game::setupTeam() {
     //Creating the team name and storing it in the MatchDay object so every stage can use it.
     std::string teamName;
     std::cout << "Enter your team name: ";
-    getline(std::cin >> std::ws, teamName);
+    getline(std::cin, teamName);
     matchDay.setUserTeam(teamName);
 
     //Creating the player roster, with names as inputs, and setting their default stats.
@@ -38,28 +38,28 @@ void Game::setupPlayers() {
     //Setting fixed shooting stats by position so match events can resolve simply for NOW.
     std::cout << "Enter your goalkeeper's name: ";
     std::string gkName;
-    getline(std::cin >> std::ws, gkName);
+    getline(std::cin, gkName);
     goalKeeper.setName(gkName);
     goalKeeper.setPosition("Goalkeeper");
     goalKeeper.setShootingStat(35);
 
     std::cout << "Enter your defender's name: ";
     std::string defenderName;
-    getline(std::cin >> std::ws, defenderName);
+    getline(std::cin, defenderName);
     defender.setName(defenderName);
     defender.setPosition("Defender");
     defender.setShootingStat(50);
 
     std::cout << "Enter your midfielder's name: ";
     std::string midfielderName;
-    getline(std::cin >> std::ws, midfielderName);
+    getline(std::cin, midfielderName);
     midfielder.setName(midfielderName);
     midfielder.setPosition("Midfielder");
     midfielder.setShootingStat(70);
 
     std::cout << "Enter your forward's name: ";
     std::string forwardName;
-    getline(std::cin >> std::ws, forwardName);
+    getline(std::cin, forwardName);
     forward.setName(forwardName);
     forward.setPosition("Forward");
     forward.setShootingStat(90);

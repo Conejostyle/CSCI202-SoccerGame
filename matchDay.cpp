@@ -92,41 +92,69 @@ std::string MatchDay::runMatch(PlayerQueue& turns, const std::string& stageName)
         std::cout << currentEvent.getEventType() << "!" << std::endl;
         std::cout << currentPlayer.getName() << " has the ball..." << std::endl;
 
-        int playerChoice = 0;
-        while (playerChoice != 1 && playerChoice != 2) {
-            std::cout << "Enter 1 to shoot or 2 to pass: ";
-            std::cin >> playerChoice;
-        }
-
         int eventChance = currentEvent.getChanceAtGoal();
+        bool playerHasBall = true;
 
-        if (playerChoice == 2) {
-            int interceptRoll = rand() % 100 + 1;
+        //Keeping the same event active until the player shoots or the ball is intercepted.
+        while (playerHasBall) {
+            std::cout << "Current chance at goal: " << eventChance << "%" << std::endl;
 
-            if (interceptRoll <= 25) {
-                std::cout << "The pass was intercepted!" << std::endl;
-                turns.enqueue(currentPlayer);
-                continue;
-            } else {
-                std::cout << "Pass completed successfully!" << std::endl;
-                eventChance += 15;
-
-                if (eventChance > 95) {
-                    eventChance = 95;
-                }
+            int playerChoice = 0;
+            while (playerChoice != 1 && playerChoice != 2) {
+                std::cout << "Enter 1 to shoot or 2 to pass: ";
+                std::cin >> playerChoice;
             }
-        }
 
-        int finalChance = (currentPlayer.getShootingStat() * eventChance) / 100;
-        int shotRoll = rand() % 100 + 1;
+            //Passing gives the player a chance to increase their shooting chance, but also a risk of losing the ball.
+            if (playerChoice == 2) {
+                //Basically 1 in 4 chance to lose the ball on a pass, which is a pretty big risk, but the reward is a 15% increase in shooting chance.
+                int interceptRoll = rand() % 100 + 1;
 
-        std::cout << "Shot success chance: " << finalChance << "/100" << std::endl;
+                if (interceptRoll <= 40) {
+                    std::cout << "The pass was intercepted!" << std::endl;
 
-        if (shotRoll <= finalChance) {
-            std::cout << "Goal for " << getUserTeam() << "!" << std::endl;
-            setUserTeamScore(getUserTeamScore() + 1);
-        } else {
-            std::cout << "No goal on this chance." << std::endl;
+                    //Giving the opponent a small chance to score immediately after winning the ball.
+                    int opponentCounterRoll = rand() % 3; // 0, 1, or 2 for a 1 in 3 chance at a counter-attack goal.
+                    if (opponentCounterRoll == 0) {
+                        std::cout << getOpponentTeam() << " scores on the counter attack!" << std::endl;
+                        setOpponentTeamScore(getOpponentTeamScore() + 1);
+                    } else {
+                        std::cout << getOpponentTeam() << " does not score from the interception." << std::endl;
+                    }
+
+                    playerHasBall = false;
+                } else {
+                    std::cout << "Pass completed successfully!" << std::endl;
+                    eventChance += 15;
+
+                    if (eventChance > 95) {
+                        eventChance = 95;
+                        //Balancing ^ so the player can never have more than a 95% chance at a goal.
+                        //Basically, you cannot pass forever to increase chances past 100%, since once you get to 95, you COULD still miss,
+                        //and also passing it also means possible interception.
+                    }
+
+                    //Rotating the ball to the next player in the queue after a successful pass.
+                    turns.enqueue(currentPlayer);
+                    currentPlayer = turns.dequeue();
+                    std::cout << currentPlayer.getName() << " now has the ball..." << std::endl;
+                }
+            } else {
+                //Shooting depends only on the player's shooting stat and the current chance at goal.
+                int finalChance = (currentPlayer.getShootingStat() * eventChance) / 100;
+                int shotRoll = rand() % 100 + 1;
+
+                std::cout << "Shot success chance: " << finalChance << "/100" << std::endl;
+
+                if (shotRoll <= finalChance) {
+                    std::cout << "Goal for " << getUserTeam() << "!" << std::endl;
+                    setUserTeamScore(getUserTeamScore() + 1);
+                } else {
+                    std::cout << "No goal on this chance." << std::endl;
+                }
+
+                playerHasBall = false;
+            }
         }
 
         //Placing the current player at the back of the queue after their turn is over.
